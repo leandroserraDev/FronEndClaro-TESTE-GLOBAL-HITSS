@@ -20,6 +20,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Presentation.Controllers
 {
+    [Route("claro/mobile")]
     public class CellController : Controller
     {
         // GET: CellController
@@ -51,7 +52,7 @@ namespace Presentation.Controllers
             return View(cells);
         }
 
-        // GET: CellController/Details/5
+        [Route("details")]
         public async Task<ActionResult> Details(string code)
         {
             var client = new HttpClient();
@@ -72,13 +73,13 @@ namespace Presentation.Controllers
             return View(entity);
         }
 
-        // GET: CellController/Create
+        [Route("create")]
         public async Task<ActionResult> Create()
         {
             return View();
         }
 
-        // POST: CellController/Create
+        [Route("create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Cell cell)
@@ -141,7 +142,8 @@ namespace Presentation.Controllers
             }
         }
 
-        // GET: CellController/Edit/5
+        [Route("edit")]
+
         public async Task<ActionResult> Edit(string code)
         {
 
@@ -235,7 +237,7 @@ namespace Presentation.Controllers
             return RedirectToAction("Index", "Cell");
 
         }
-
+        [Route("delete")]
         public async Task<ActionResult> Delete(string code)
         {
             var client = new HttpClient();
@@ -263,6 +265,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
+        [Route("delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string code, IFormCollection collection)
         {

@@ -37,7 +37,7 @@ namespace Presentation.Services
 
 
             HttpResponseMessage response = await client.GetAsync
-        ("/api/claro");
+        ("/api/claro/mobile");
             string stringCells =await  response.Content.ReadAsStringAsync();
             List<CellViewModel> cells = JsonSerializer.Deserialize<List<CellViewModel>>(stringCells);
 
@@ -76,7 +76,7 @@ namespace Presentation.Services
         System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PostAsync("/api/claro", contentData);
+            HttpResponseMessage response = await client.PostAsync("/api/claro/mobile", contentData);
             string stringResult = response.Content.
         ReadAsStringAsync().Result;
 
@@ -98,7 +98,7 @@ namespace Presentation.Services
             var contentData = new StringContent(stringData,System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PutAsync($@"/api/claro/{code}", contentData);
+            HttpResponseMessage response = await client.PutAsync($@"/api/claro//mobile/{code}", contentData);
 
             string stringResult = response.Content.ReadAsStringAsync().Result;
 
@@ -117,7 +117,7 @@ namespace Presentation.Services
             client.DefaultRequestHeaders.Accept.Add(contentType);
 
 
-            UriBuilder builder = new UriBuilder($@"{localHost}claro/{code}");
+            UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
 
             var response = await client.GetAsync(builder.Uri);
 
@@ -149,7 +149,7 @@ namespace Presentation.Services
             client.DefaultRequestHeaders.Accept.Add(contentType);
 
 
-            UriBuilder builder = new UriBuilder($@"{localHost}claro/{code}");
+            UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
 
             var response = await  client.GetAsync(builder.Uri);
 
@@ -180,7 +180,7 @@ namespace Presentation.Services
             client.DefaultRequestHeaders.Accept.Add(contentType);
 
 
-            UriBuilder builder = new UriBuilder($@"{localHost}claro/{code}");
+            UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
 
             var response = await  client.DeleteAsync(builder.Uri);
 
