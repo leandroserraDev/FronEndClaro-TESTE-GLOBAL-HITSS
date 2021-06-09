@@ -46,7 +46,7 @@ namespace Presentation.Services
                 listCell.Add(newEntity);
             }
 
-            return listCell;
+            return await Task.FromResult(listCell);
         }
 
         public static bool Create(CellViewModel cell, HttpClient client)
