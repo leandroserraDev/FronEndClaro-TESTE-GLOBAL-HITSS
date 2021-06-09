@@ -16,6 +16,7 @@ namespace Presentation.Services
         Task<Cell> Get(String code, HttpClient client);
         Task<bool> Delete(String code, HttpClient client);
         Task<bool> CreateUser(UserViewModel user);
+        Task<JWT> LoginUser(UserViewModel user);
 
     }
 }

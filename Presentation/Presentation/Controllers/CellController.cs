@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -58,6 +59,13 @@ namespace Presentation.Controllers
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
+
+
             var entity = await _serviceApi.Get(code, client);
             if (entity == null) return RedirectToAction("Index", "Cell");
 
@@ -81,6 +89,13 @@ namespace Presentation.Controllers
                 var client = new HttpClient();
 
                 string token = Request.Cookies["bearer"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["LoginFailure"] = "Login failure";
+                    return RedirectToAction("Index", "Auth");
+                }
+
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 //Save image to wwwroot/image
@@ -133,6 +148,12 @@ namespace Presentation.Controllers
             var client = new HttpClient();
 
             string token = Request.Cookies["bearer"];
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
+
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var entity = await _serviceApi.Get(code, client);
@@ -151,6 +172,13 @@ namespace Presentation.Controllers
 
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
+
 
             string model = formCollection["Model"];
             var price = formCollection["Price"];
@@ -215,6 +243,12 @@ namespace Presentation.Controllers
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
+     
 
             if (string.IsNullOrEmpty(code))
             {
@@ -236,6 +270,13 @@ namespace Presentation.Controllers
 
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
+
 
             if (string.IsNullOrEmpty(code))
             {

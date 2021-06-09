@@ -23,27 +23,11 @@ namespace Presentation.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Login(UserViewModel user)
         {
+            var jwt = await _serviceApi.LoginUser(user);
 
-            string baseUrl = "https://localhost:44384/api/";
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(baseUrl);
-            var contentType = new MediaTypeWithQualityHeaderValue
-        ("application/json");
-            client.DefaultRequestHeaders.Accept.Add(contentType);
-
-
-            string stringData = JsonSerializer.Serialize(user);
-            var contentData = new StringContent(stringData,
-        System.Text.Encoding.UTF8, "application/json");
-
-
-            HttpResponseMessage response = await client.PostAsync("/api/auth/login", contentData);
-            string stringJWT = await response.Content.ReadAsStringAsync();
-            JWT jwt = JsonSerializer.Deserialize<JWT>(stringJWT);
-
-            if (string.IsNullOrEmpty(jwt.token))
+            if (jwt == null || string.IsNullOrEmpty(jwt.token))
             {
                 TempData["LoginFailure"] = "Login failure";
                 return RedirectToAction("Index", "Auth");
