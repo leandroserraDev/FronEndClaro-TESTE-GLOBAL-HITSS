@@ -33,8 +33,8 @@ namespace Presentation.Controllers
 
             HttpResponseMessage response = client.PostAsync
             ("/api/auth/login", contentData).Result;
-                string stringJWT = response.Content.
-            ReadAsStringAsync().Result;
+            string stringJWT = response.Content.
+        ReadAsStringAsync().Result;
             JWT jwt = JsonSerializer.Deserialize<JWT>(stringJWT);
 
             if (string.IsNullOrEmpty(jwt.token))
@@ -54,15 +54,14 @@ namespace Presentation.Controllers
 
         // GET: AuthController
         public ActionResult Index()
-
         {
 
-            //string token = Request.Cookies["bearer"];
+            string token = Request.Cookies["bearer"];
 
-            //if (!string.IsNullOrEmpty(token))
-            //{
-            //    return RedirectToAction("Index", "Cell");
-            //}
+            if (!string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Index", "Cell");
+            }
 
             return View();
         }
@@ -89,6 +88,6 @@ namespace Presentation.Controllers
             return RedirectToAction("Index", "Auth");
         }
 
-     
+
     }
 }
