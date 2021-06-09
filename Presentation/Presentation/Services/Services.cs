@@ -13,7 +13,7 @@ namespace Presentation.Services
 {
     public static class Services
     {
-        public static List<Cell> GetAll(HttpClient client)
+        public async static Task<List<Cell>> GetAll(HttpClient client)
         {
             string baseUrl = "https://localhost:44384/api/";
             client.BaseAddress = new Uri(baseUrl);
@@ -37,7 +37,7 @@ namespace Presentation.Services
                     Model = cell.model,
                     Price = cell.price,
                     Brand = cell.brand,
-                    Photo = ConvertToBase64.ConvertImageToBase64(cell.photo).Result,
+                    Photo = ConvertToBase64.ConvertImageToBase64(cell.photo),
                     Date = cell.date
                 };
 
@@ -159,7 +159,7 @@ namespace Presentation.Services
                 Model = cell.model,
                 Price = cell.price,
                 Brand = cell.brand,
-                Photo = ConvertToBase64.ConvertImageToBase64(cell.photo).Result,
+                Photo = ConvertToBase64.ConvertImageToBase64(cell.photo),
                 Date = cell.date
             };
 

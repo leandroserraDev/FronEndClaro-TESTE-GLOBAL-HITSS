@@ -14,34 +14,36 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Model" class="control-label"></label>
-                <input asp-for="Model" class="form-control" required  autofocus/>
+                <input asp-for="Model" class="form-control" required autofocus />
                 <span asp-validation-for="Model" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
-                <input type="number" min="0.00" max="10000.00" step="0.01" asp-for="Price" class="form-control" required autofocus/>
+                <input type="number" min="0.00" max="10000.00" step="0.01" asp-for="Price" class="form-control" required autofocus />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Brand" class="control-label"></label>
-                <input asp-for="Brand" class="form-control" required autofocus/>
+                <input asp-for="Brand" class="form-control" required autofocus />
                 <span asp-validation-for="Brand" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" required autofocus/>
+                <input asp-for="Date" class="form-control" required autofocus />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
-                <input asp-for="ImageFile" accept="image/*"  required autofocus/>
+                <input asp-for="ImageFile" required autofocus />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
+            <strong style="color:red">@TempData["LoginFailure"]</strong>
+
         </form>
 
 

@@ -10,21 +10,26 @@ namespace Presentation.Helpers
 {
     public static class ConvertToBase64 
     {
-        public static async Task<string> ConvertImageToBase64(string path)
+        public static string ConvertImageToBase64(string path)
         {
-
-            using (Image image = Image.FromFile(path))
+            if (System.IO.File.Exists(path))
             {
-                using (MemoryStream m = new MemoryStream())
+                using (Image image = Image.FromFile(path, true))
                 {
-                    image.Save(m, image.RawFormat);
-                    byte[] imageBytes = m.ToArray();
+                    using (MemoryStream m = new MemoryStream())
+                    {
+                        image.Save(m, image.RawFormat);
+                        byte[] imageBytes = m.ToArray();
 
-                    // Convert byte[] to Base64 String
-                    string base64String = Convert.ToBase64String(imageBytes);
-                    return await Task.FromResult(base64String);
+                        // Convert byte[] to Base64 String
+                        string base64String = Convert.ToBase64String(imageBytes);
+                        return base64String;
+                    }
                 }
             }
+
+            return null;
+       
         }
 
     }

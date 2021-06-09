@@ -50,7 +50,12 @@ namespace Presentation.Controllers
             return RedirectToAction("Index", "Cell");
         }
 
+        public ActionResult Logout()
+        {
+            HttpContext.Response.Cookies.Append("bearer", "", new CookieOptions { Path = "/" });
 
+            return RedirectToAction("Index", "Auth");
+        }
 
         // GET: AuthController
         public ActionResult Index()
@@ -63,12 +68,6 @@ namespace Presentation.Controllers
                 return RedirectToAction("Index", "Cell");
             }
 
-            return View();
-        }
-
-        // GET: AuthController/Details/5
-        public ActionResult Details(int id)
-        {
             return View();
         }
 

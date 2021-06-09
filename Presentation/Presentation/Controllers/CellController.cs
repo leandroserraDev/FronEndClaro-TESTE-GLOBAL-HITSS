@@ -28,14 +28,20 @@ namespace Presentation.Controllers
             _hostingEnv = hostingEnv;
         }
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             var client = new HttpClient();
 
             string token = Request.Cookies["bearer"];
+
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["TokenDefault"] = "Token Expired";
+                return RedirectToAction("Index", "Auth");
+            }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var cells = Services.Services.GetAll(client);
+            var cells = await Services.Services.GetAll(client);
             if (cells == null) return View();
 
             return View(cells);
@@ -80,11 +86,22 @@ namespace Presentation.Controllers
 
 
                 string extension = Path.GetExtension(cell.ImageFile.FileName);
-                string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6) ).Trim() + extension;
+                List<string> extensions = new List<string>();
+
+                var contentType = cell.ImageFile.ContentType.Split("/")[1];
+
+                if (contentType.ToUpper() != "JPG" && contentType.ToUpper() != "JPEG"
+                    && contentType.ToUpper() != "PNG" && contentType.ToUpper() != "GIF")
+                {
+
+                    TempData["LoginFailure"] = "Extension file failure";
+                    return View();
+                }
+                string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
                 cell.Photo = path;
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
-                    cell.ImageFile.CopyToAsync(fileStream);
+                    cell.ImageFile.CopyToAsync(fileStream).GetAwaiter();
                 }
                 var viewEntity = new CellViewModel()
                 {
@@ -136,15 +153,18 @@ namespace Presentation.Controllers
             var price = formCollection["Price"];
             var brand = formCollection["Brand"];
             var date = formCollection["Date"];
-           var imageFile = formCollection["ImageFile"];
+            var imageFile = formCollection["ImageFile"];
 
 
             //Save image to wwwroot/image
             string wwwRootPath = _hostingEnv.WebRootPath;
             string fileName = Path.GetFileNameWithoutExtension(formCollection.Files[0].FileName);
             string extension = Path.GetExtension(formCollection.Files[0].FileName);
-            string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + extension;
-            
+
+            var contentType = formCollection.Files[0].ContentType.Split("/")[1];
+
+            string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
+
             using (var fileStream = new FileStream(path, FileMode.Create))
             {
                 formCollection.Files[0].CopyToAsync(fileStream);
@@ -214,7 +234,7 @@ namespace Presentation.Controllers
 
             if (entity == null) return View();
 
-            if(System.IO.File.Exists(entity.Photo))
+            if (System.IO.File.Exists(entity.Photo))
             {
                 System.IO.File.Delete(entity.Photo);
             }
@@ -223,7 +243,7 @@ namespace Presentation.Controllers
             if (!cell) return View();
 
 
-            return RedirectToAction("Index","Cell");
+            return RedirectToAction("Index", "Cell");
         }
     }
 }
