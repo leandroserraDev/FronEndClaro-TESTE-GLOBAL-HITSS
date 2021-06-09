@@ -51,8 +51,9 @@
 
     <form asp-action="Delete" method="post">
         <input type="hidden" asp-for="Code" />
-        <button type="submit" class="btn btn-outline-danger">Delete</button>
-        <a asp-action="Index">Back to List</a>
+        <button type="submit" class="btn btn-danger">Delete</button>
+        @Html.ActionLink("Back to cell", "Index", "Cell", null, new { @class = "btn btn-primary" })
+
 
     </form>
 </div>

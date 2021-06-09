@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Presentation.Models;
+using Presentation.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -22,10 +23,12 @@ namespace Presentation.Controllers
     {
         // GET: CellController
         private readonly IWebHostEnvironment _hostingEnv;
+        private readonly IServiceApi _serviceApi;
 
-        public CellController(IWebHostEnvironment hostingEnv)
+        public CellController(IWebHostEnvironment hostingEnv, IServiceApi serviceApi)
         {
             _hostingEnv = hostingEnv;
+            _serviceApi = serviceApi;
         }
 
         public async Task<ActionResult> Index()
@@ -41,28 +44,28 @@ namespace Presentation.Controllers
             }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var cells = await Services.Services.GetAll(client);
+            var cells = await _serviceApi.GetAll(client);
             if (cells == null) return View();
 
             return View(cells);
         }
 
         // GET: CellController/Details/5
-        public ActionResult Details(string code)
+        public async Task<ActionResult> Details(string code)
         {
             var client = new HttpClient();
 
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var entity = Services.Services.Get(code, client);
+            var entity = await _serviceApi.Get(code, client);
             if (entity == null) return RedirectToAction("Index", "Cell");
 
             return View(entity);
         }
 
         // GET: CellController/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
             return View();
         }
@@ -70,7 +73,7 @@ namespace Presentation.Controllers
         // POST: CellController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Cell cell)
+        public async Task<ActionResult> Create(Cell cell)
         {
 
             try
@@ -97,11 +100,11 @@ namespace Presentation.Controllers
                     TempData["LoginFailure"] = "Extension file failure";
                     return View();
                 }
-                string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
+                string path = Path.Combine(wwwRootPath + "\\Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
                 cell.Photo = path;
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
-                    cell.ImageFile.CopyToAsync(fileStream).GetAwaiter();
+                    await cell.ImageFile.CopyToAsync(fileStream);
                 }
                 var viewEntity = new CellViewModel()
                 {
@@ -113,18 +116,18 @@ namespace Presentation.Controllers
                     date = cell.Date
 
                 };
-                Services.Services.Create(viewEntity, client);
+                await _serviceApi.Create(viewEntity, client);
 
                 return RedirectToAction("Index", "Cell");
             }
             catch (Exception e)
             {
-                return View();
+                return RedirectToAction("Index", "Cell");
             }
         }
 
         // GET: CellController/Edit/5
-        public ActionResult Edit(string code)
+        public async Task<ActionResult> Edit(string code)
         {
 
             var client = new HttpClient();
@@ -132,7 +135,7 @@ namespace Presentation.Controllers
             string token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var entity = Services.Services.Get(code, client);
+            var entity = await _serviceApi.Get(code, client);
             if (entity == null) return RedirectToAction("Index", "Cell");
 
             return View(entity);
@@ -141,7 +144,7 @@ namespace Presentation.Controllers
         // POST: CellController/Edit/5
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult EditConfirmed(string code, IFormCollection formCollection)
+        public async Task<ActionResult> EditConfirmed(string code, IFormCollection formCollection)
         {
 
             var client = new HttpClient();
@@ -163,11 +166,19 @@ namespace Presentation.Controllers
 
             var contentType = formCollection.Files[0].ContentType.Split("/")[1];
 
+            if (contentType.ToUpper() != "JPG" && contentType.ToUpper() != "JPEG"
+               && contentType.ToUpper() != "PNG" && contentType.ToUpper() != "GIF")
+            {
+
+                TempData["LoginFailure"] = "Extension file failure";
+                return  View();
+            }
+
             string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
 
             using (var fileStream = new FileStream(path, FileMode.Create))
             {
-                formCollection.Files[0].CopyToAsync(fileStream);
+                await formCollection.Files[0].CopyToAsync(fileStream);
             }
             var viewEntity = new CellViewModel()
             {
@@ -178,7 +189,7 @@ namespace Presentation.Controllers
                 date = Convert.ToDateTime(date)
 
             };
-            var entity = Services.Services.GetReal(code, client);
+            var entity = await _serviceApi.GetReal(code, client);
 
             if (entity == null) return RedirectToAction("Index", "Cell");
 
@@ -191,13 +202,13 @@ namespace Presentation.Controllers
 
             token = Request.Cookies["bearer"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            Services.Services.Edit(code, viewEntity, client);
+            await _serviceApi.Edit(code, viewEntity, client);
 
             return RedirectToAction("Index", "Cell");
 
         }
 
-        public ActionResult Delete(string code)
+        public async Task<ActionResult> Delete(string code)
         {
             var client = new HttpClient();
 
@@ -209,7 +220,7 @@ namespace Presentation.Controllers
             {
                 return View();
             }
-            var entity = Services.Services.Get(code, client);
+            var entity = await _serviceApi.Get(code, client);
 
 
             if (entity == null) return View();
@@ -219,7 +230,7 @@ namespace Presentation.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string code, IFormCollection collection)
+        public async Task<ActionResult> DeleteConfirmed(string code, IFormCollection collection)
         {
             var client = new HttpClient();
 
@@ -230,7 +241,7 @@ namespace Presentation.Controllers
             {
                 return RedirectToAction("Index", "Cell");
             }
-            var entity = Services.Services.GetReal(code, client);
+            var entity = await _serviceApi.GetReal(code, client);
 
             if (entity == null) return View();
 
@@ -239,7 +250,7 @@ namespace Presentation.Controllers
                 System.IO.File.Delete(entity.Photo);
             }
 
-            var cell = Services.Services.Delete(code, client);
+            var cell = await  _serviceApi.Delete(code, client);
             if (!cell) return View();
 
 

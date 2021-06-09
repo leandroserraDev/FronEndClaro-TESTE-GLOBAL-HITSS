@@ -19,7 +19,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Model" class="control-label"></label>
-                <input asp-for="Model" class="form-control" required autofocus/>
+                <input asp-for="Model" class="form-control" required autofocus />
                 <span asp-validation-for="Model" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -29,31 +29,29 @@
             </div>
             <div class="form-group">
                 <label asp-for="Brand" class="control-label"></label>
-                <input asp-for="Brand" class="form-control" required autofocus/>
+                <input asp-for="Brand" class="form-control" required autofocus />
                 <span asp-validation-for="Brand" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
-                <input asp-for="ImageFile" accept="image/*" required autofocus/>
+                <input asp-for="ImageFile" accept="image/*" required autofocus />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" required autofocus/>
+                <input asp-for="Date" class="form-control" required autofocus />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
 
             <input type="hidden" asp-for="Code" />
-            <button type="submit" class="btn btn-outline-primary">Edit</button>
-            <a asp-action="Index">Back to List of Cells</a>
+            <button type="submit" class="btn btn-warning">Edit</button>
+            @Html.ActionLink("back to list", "Index", "Cell", null, new { @class = "btn btn-primary" }) 
+
 
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
+using Presentation.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,15 @@ namespace Presentation.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IServiceApi _serviceApi;
+
+        public AuthController(IServiceApi serviceApi)
+        {
+            _serviceApi = serviceApi;
+        }
+
         [AllowAnonymous]
-        public IActionResult Login(User user)
+        public async Task<IActionResult> Login(User user)
         {
 
             string baseUrl = "https://localhost:44384/api/";
@@ -31,10 +39,8 @@ namespace Presentation.Controllers
         System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = client.PostAsync
-            ("/api/auth/login", contentData).Result;
-            string stringJWT = response.Content.
-        ReadAsStringAsync().Result;
+            HttpResponseMessage response = await client.PostAsync("/api/auth/login", contentData);
+            string stringJWT = await response.Content.ReadAsStringAsync();
             JWT jwt = JsonSerializer.Deserialize<JWT>(stringJWT);
 
             if (string.IsNullOrEmpty(jwt.token))
@@ -50,15 +56,15 @@ namespace Presentation.Controllers
             return RedirectToAction("Index", "Cell");
         }
 
-        public ActionResult Logout()
+        public async Task<ActionResult> Logout()
         {
             HttpContext.Response.Cookies.Append("bearer", "", new CookieOptions { Path = "/" });
 
-            return RedirectToAction("Index", "Auth");
+            return await Task.FromResult(RedirectToAction("Index", "Auth"));
         }
 
         // GET: AuthController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
 
             string token = Request.Cookies["bearer"];
@@ -80,9 +86,9 @@ namespace Presentation.Controllers
         // POST: AuthController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(UserViewModel user)
+        public async Task<ActionResult> Create(UserViewModel user)
         {
-            Services.Services.CreateUser(user);
+            await _serviceApi.CreateUser(user);
 
             return RedirectToAction("Index", "Auth");
         }

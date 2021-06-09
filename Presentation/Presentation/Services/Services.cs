@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Presentation.Services
 {
-    public static class Services
+    public  class Services : IServiceApi
     {
-        public async static Task<List<Cell>> GetAll(HttpClient client)
+        public async  Task<List<Cell>> GetAll(HttpClient client)
         {
             string baseUrl = "https://localhost:44384/api/";
             client.BaseAddress = new Uri(baseUrl);
@@ -22,10 +22,9 @@ namespace Presentation.Services
             client.DefaultRequestHeaders.Accept.Add(contentType);
 
 
-            HttpResponseMessage response = client.GetAsync
-        ("/api/claro").Result;
-            string stringCells = response.Content.
-        ReadAsStringAsync().Result;
+            HttpResponseMessage response = await client.GetAsync
+        ("/api/claro");
+            string stringCells =await  response.Content.ReadAsStringAsync();
             List<CellViewModel> cells = JsonSerializer.Deserialize<List<CellViewModel>>(stringCells);
 
             var listCell = new List<Cell>();
@@ -49,7 +48,7 @@ namespace Presentation.Services
             return await Task.FromResult(listCell);
         }
 
-        public static bool Create(CellViewModel cell, HttpClient client)
+        public async Task<bool> Create(CellViewModel cell, HttpClient client)
         {
             string baseUrl = "https://localhost:44384/api/";
             client.BaseAddress = new Uri(baseUrl);
@@ -63,8 +62,8 @@ namespace Presentation.Services
         System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = client.PostAsync
-        ("/api/claro", contentData).Result;
+            HttpResponseMessage response = await client.PostAsync
+        ("/api/claro", contentData);
             string stringResult = response.Content.
         ReadAsStringAsync().Result;
 
@@ -74,7 +73,7 @@ namespace Presentation.Services
 
         }
 
-        public static bool Edit(string code, CellViewModel cell, HttpClient client)
+        public  async Task<bool> Edit(string code, CellViewModel cell, HttpClient client)
         {
             string baseUrl = "https://localhost:44384/api/";
             client.BaseAddress = new Uri(baseUrl);
@@ -88,10 +87,9 @@ namespace Presentation.Services
         System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = client.PutAsync
-        ($@"/api/claro/{code}", contentData).Result;
-            string stringResult = response.Content.
-        ReadAsStringAsync().Result;
+            HttpResponseMessage response = await client.PutAsync($@"/api/claro/{code}", contentData);
+
+            string stringResult = response.Content.ReadAsStringAsync().Result;
 
             stringResult.Contains("True");
 
@@ -100,7 +98,7 @@ namespace Presentation.Services
         }
 
 
-        public static Cell GetReal(String code, HttpClient client)
+        public  async Task<Cell> GetReal(String code, HttpClient client)
         {
             string baseUrl = "https://localhost:44384/api/";
 
@@ -111,9 +109,9 @@ namespace Presentation.Services
 
             UriBuilder builder = new UriBuilder($@"https://localhost:44384/api/claro/{code}");
 
-            var response = client.GetAsync(builder.Uri).Result;
+            var response = await client.GetAsync(builder.Uri);
 
-            string stringCells = response.Content.ReadAsStringAsync().Result;
+            string stringCells = await response.Content.ReadAsStringAsync();
 
             CellViewModel cell = JsonSerializer.Deserialize<CellViewModel>(stringCells);
 
@@ -134,9 +132,8 @@ namespace Presentation.Services
 
 
 
-        public static Cell Get(String code, HttpClient client)
+        public  async Task<Cell> Get(String code, HttpClient client)
         {
-            string baseUrl = "https://localhost:44384/api/";
 
             var contentType = new MediaTypeWithQualityHeaderValue
         ("application/json");
@@ -145,9 +142,9 @@ namespace Presentation.Services
 
             UriBuilder builder = new UriBuilder($@"https://localhost:44384/api/claro/{code}");
 
-            var response = client.GetAsync(builder.Uri).Result;
+            var response = await  client.GetAsync(builder.Uri);
 
-            string stringCells = response.Content.ReadAsStringAsync().Result;
+            string stringCells = await response.Content.ReadAsStringAsync();
 
             CellViewModel cell = JsonSerializer.Deserialize<CellViewModel>(stringCells);
 
@@ -166,9 +163,8 @@ namespace Presentation.Services
             return newEntity;
         }
      
-        public static bool Delete(String code, HttpClient client)
+        public  async Task<bool> Delete(String code, HttpClient client)
         {
-            string baseUrl = "https://localhost:44384/api/";
 
             var contentType = new MediaTypeWithQualityHeaderValue
         ("application/json");
@@ -177,14 +173,14 @@ namespace Presentation.Services
 
             UriBuilder builder = new UriBuilder($@"https://localhost:44384/api/claro/{code}");
 
-            var response = client.DeleteAsync(builder.Uri).Result;
+            var response = await  client.DeleteAsync(builder.Uri);
 
-            string stringCells = response.Content.ReadAsStringAsync().Result;
+            string stringCells = await  response.Content.ReadAsStringAsync();
 
             return true;
         }
 
-        public static bool CreateUser(UserViewModel user)
+        public async Task<bool> CreateUser(UserViewModel user)
         {
             string baseUrl = "https://localhost:44384/api/";
             var client = new HttpClient();
@@ -199,10 +195,8 @@ namespace Presentation.Services
         System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = client.PostAsync
-        ("auth", contentData).Result;
-            string stringResult = response.Content.
-        ReadAsStringAsync().Result;
+            HttpResponseMessage response = await client.PostAsync("auth", contentData);
+            string stringResult = response.Content.ReadAsStringAsync().Result;
 
             stringResult.Contains("True");
 
