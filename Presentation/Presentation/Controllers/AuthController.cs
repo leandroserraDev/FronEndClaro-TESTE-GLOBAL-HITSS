@@ -23,15 +23,15 @@ namespace Presentation.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Login(UserViewModel user)
+        public async Task<IActionResult> Login(User user)
         {
-            var jwt = await _serviceApi.LoginUser(user);
-
-            if (jwt == null || string.IsNullOrEmpty(jwt.token))
+            var userViewModel = new UserViewModel()
             {
-                TempData["LoginFailure"] = "Login failure";
-                return RedirectToAction("Index", "Auth");
-            }
+                login = user.Login,
+                password = user.Password
+            };
+            var jwt = await _serviceApi.LoginUser(userViewModel);
+
             // HttpContext.Response.Cookies.Append(
             HttpContext.Response.Cookies.Append("bearer", jwt.token, new CookieOptions { Path = "/" });
 

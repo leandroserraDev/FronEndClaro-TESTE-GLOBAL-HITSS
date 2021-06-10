@@ -1,3 +1,5 @@
+using HAdministradora.Infra.CrossCutting.Aws.Interfaces.Services;
+using HAdministradora.Infra.CrossCutting.Aws.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +35,7 @@ namespace Presentation
             services.AddControllersWithViews();
 
             services.AddScoped<IServiceApi, Services.Services>();
+            services.AddScoped<IBucketS3Service, BucketS3Service>();
       
             var key = Encoding.ASCII.GetBytes("fedaf7d8863b48e197b9287d492b708e");
             services.AddAuthentication(x =>

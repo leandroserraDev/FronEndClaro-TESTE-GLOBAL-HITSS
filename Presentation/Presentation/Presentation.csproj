@@ -19,4 +19,8 @@
     <Folder Include="wwwroot\Image\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Presentation.AWS\Presentation.AWS.csproj" />
+  </ItemGroup>
+
 </Project>

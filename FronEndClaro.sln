@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation", "Presentation\Presentation\Presentation.csproj", "{F233A814-745D-4971-B7C0-086A0B4533FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation", "Presentation\Presentation\Presentation.csproj", "{F233A814-745D-4971-B7C0-086A0B4533FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.AWS", "src\Presentation.AWS\Presentation.AWS.csproj", "{EB4392D7-8F1A-4D2B-BCF5-7BE0626E1C49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F233A814-745D-4971-B7C0-086A0B4533FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F233A814-745D-4971-B7C0-086A0B4533FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F233A814-745D-4971-B7C0-086A0B4533FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB4392D7-8F1A-4D2B-BCF5-7BE0626E1C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB4392D7-8F1A-4D2B-BCF5-7BE0626E1C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB4392D7-8F1A-4D2B-BCF5-7BE0626E1C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB4392D7-8F1A-4D2B-BCF5-7BE0626E1C49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

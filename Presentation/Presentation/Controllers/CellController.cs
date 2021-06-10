@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.InkML;
+using HAdministradora.Infra.CrossCutting.Aws.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,11 +27,13 @@ namespace Presentation.Controllers
         // GET: CellController
         private readonly IWebHostEnvironment _hostingEnv;
         private readonly IServiceApi _serviceApi;
+        private readonly IBucketS3Service _bucketS3Service;
 
-        public CellController(IWebHostEnvironment hostingEnv, IServiceApi serviceApi)
+        public CellController(IWebHostEnvironment hostingEnv, IServiceApi serviceApi, IBucketS3Service bucketS3Service)
         {
             _hostingEnv = hostingEnv;
             _serviceApi = serviceApi;
+            _bucketS3Service = bucketS3Service;
         }
 
         public async Task<ActionResult> Index()
@@ -39,11 +42,6 @@ namespace Presentation.Controllers
 
             string token = Request.Cookies["bearer"];
 
-            if (string.IsNullOrEmpty(token))
-            {
-                TempData["TokenDefault"] = "Token Expired";
-                return RedirectToAction("Index", "Auth");
-            }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var cells = await _serviceApi.GetAll(client);
@@ -76,7 +74,7 @@ namespace Presentation.Controllers
         [Route("create")]
         public async Task<ActionResult> Create()
         {
-            return View();
+            return await Task.FromResult(View());
         }
 
         [Route("create")]
@@ -99,11 +97,6 @@ namespace Presentation.Controllers
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                //Save image to wwwroot/image
-                string wwwRootPath = _hostingEnv.WebRootPath;
-                string fileName = Path.GetFileNameWithoutExtension(cell.ImageFile.FileName);
-
-
                 string extension = Path.GetExtension(cell.ImageFile.FileName);
                 List<string> extensions = new List<string>();
 
@@ -113,15 +106,18 @@ namespace Presentation.Controllers
                     && contentType.ToUpper() != "PNG" && contentType.ToUpper() != "GIF")
                 {
 
-                    TempData["LoginFailure"] = "Extension file failure";
+                    TempData["LoginFailure"] = "EXTENSION NOT APPLICABLE";
                     return View();
                 }
-                string path = Path.Combine(wwwRootPath + "\\Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
-                cell.Photo = path;
-                using (var fileStream = new FileStream(path, FileMode.Create))
-                {
-                    await cell.ImageFile.CopyToAsync(fileStream);
-                }
+
+                string pathAWS = Path.Combine(cell.Model, Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType);
+
+                //Save image in s3 amazon
+
+                await _bucketS3Service.UploadObjectAsync(cell.ImageFile.OpenReadStream(), pathAWS);
+
+                cell.Photo = pathAWS;
+
                 var viewEntity = new CellViewModel()
                 {
                     code = cell.Code,
@@ -136,7 +132,7 @@ namespace Presentation.Controllers
 
                 return RedirectToAction("Index", "Cell");
             }
-            catch (Exception e)
+            catch
             {
                 return RedirectToAction("Index", "Cell");
             }
@@ -165,7 +161,7 @@ namespace Presentation.Controllers
         }
 
         // POST: CellController/Edit/5
-        [HttpPost, ActionName("Edit")]
+        [HttpPost, ActionName("Editar")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditConfirmed(string code, IFormCollection formCollection)
         {
@@ -188,12 +184,6 @@ namespace Presentation.Controllers
             var date = formCollection["Date"];
             var imageFile = formCollection["ImageFile"];
 
-
-            //Save image to wwwroot/image
-            string wwwRootPath = _hostingEnv.WebRootPath;
-            string fileName = Path.GetFileNameWithoutExtension(formCollection.Files[0].FileName);
-            string extension = Path.GetExtension(formCollection.Files[0].FileName);
-
             var contentType = formCollection.Files[0].ContentType.Split("/")[1];
 
             if (contentType.ToUpper() != "JPG" && contentType.ToUpper() != "JPEG"
@@ -201,21 +191,20 @@ namespace Presentation.Controllers
             {
 
                 TempData["LoginFailure"] = "Extension file failure";
-                return  View();
+                return View();
             }
 
-            string path = Path.Combine(wwwRootPath + "/Image", Guid.NewGuid().ToString().Substring(0, 6)).Trim() + "." + contentType;
+            string pathAWS = Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType;
 
-            using (var fileStream = new FileStream(path, FileMode.Create))
-            {
-                await formCollection.Files[0].CopyToAsync(fileStream);
-            }
+            await _bucketS3Service.UploadObjectAsync(formCollection.Files[0].OpenReadStream(), $@"{model}/{pathAWS}");
+
+
             var viewEntity = new CellViewModel()
             {
                 model = model,
                 price = Convert.ToInt32(price),
                 brand = brand,
-                photo = path,
+                photo = pathAWS,
                 date = Convert.ToDateTime(date)
 
             };
@@ -225,7 +214,8 @@ namespace Presentation.Controllers
 
             if (System.IO.File.Exists(entity.Photo))
             {
-                System.IO.File.Delete(entity.Photo);
+                await _bucketS3Service.DeleteSingleObject(entity.Photo);
+
             }
 
             client = new HttpClient();
@@ -250,7 +240,7 @@ namespace Presentation.Controllers
                 TempData["LoginFailure"] = "Login failure";
                 return RedirectToAction("Index", "Auth");
             }
-     
+
 
             if (string.IsNullOrEmpty(code))
             {
@@ -280,7 +270,6 @@ namespace Presentation.Controllers
                 return RedirectToAction("Index", "Auth");
             }
 
-
             if (string.IsNullOrEmpty(code))
             {
                 return RedirectToAction("Index", "Cell");
@@ -291,12 +280,11 @@ namespace Presentation.Controllers
 
             if (System.IO.File.Exists(entity.Photo))
             {
-                System.IO.File.Delete(entity.Photo);
+                await _bucketS3Service.DeleteSingleObject(entity.Photo);
             }
 
-            var cell = await  _serviceApi.Delete(code, client);
+            var cell = await _serviceApi.Delete(code, client);
             if (!cell) return View();
-
 
             return RedirectToAction("Index", "Cell");
         }
