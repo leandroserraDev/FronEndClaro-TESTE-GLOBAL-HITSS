@@ -127,7 +127,7 @@ namespace Presentation.Services
             var contentData = new StringContent(stringData, System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PutAsync($@"/api/claro//mobile/{code}", contentData);
+            HttpResponseMessage response = await client.PutAsync($@"/api/claro/mobile/{code}", contentData);
 
             string stringResult = response.Content.ReadAsStringAsync().Result;
 

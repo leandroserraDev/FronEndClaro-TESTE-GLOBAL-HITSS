@@ -40,7 +40,16 @@ namespace Presentation.Controllers
         {
             var client = new HttpClient();
 
+
+
             string token = Request.Cookies["bearer"];
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["LoginFailure"] = "Login failure";
+                return RedirectToAction("Index", "Auth");
+            }
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -139,7 +148,6 @@ namespace Presentation.Controllers
         }
 
         [Route("edit")]
-
         public async Task<ActionResult> Edit(string code)
         {
 
@@ -161,9 +169,10 @@ namespace Presentation.Controllers
         }
 
         // POST: CellController/Edit/5
-        [HttpPost, ActionName("Editar")]
+        [HttpPost, ActionName("edit")]
+        [Route("edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditConfirmed(string code, IFormCollection formCollection)
+        public async Task<ActionResult> Edit(string code, IFormCollection formCollection)
         {
 
             var client = new HttpClient();
@@ -194,9 +203,9 @@ namespace Presentation.Controllers
                 return View();
             }
 
-            string pathAWS = Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType;
+            string pathAWS = Path.Combine(model, Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType);
 
-            await _bucketS3Service.UploadObjectAsync(formCollection.Files[0].OpenReadStream(), $@"{model}/{pathAWS}");
+            await _bucketS3Service.UploadObjectAsync(formCollection.Files[0].OpenReadStream(), pathAWS);
 
 
             var viewEntity = new CellViewModel()
@@ -212,11 +221,9 @@ namespace Presentation.Controllers
 
             if (entity == null) return RedirectToAction("Index", "Cell");
 
-            if (System.IO.File.Exists(entity.Photo))
-            {
-                await _bucketS3Service.DeleteSingleObject(entity.Photo);
 
-            }
+            await _bucketS3Service.DeleteSingleObject(entity.Photo);
+
 
             client = new HttpClient();
 
@@ -278,10 +285,9 @@ namespace Presentation.Controllers
 
             if (entity == null) return View();
 
-            if (System.IO.File.Exists(entity.Photo))
-            {
-                await _bucketS3Service.DeleteSingleObject(entity.Photo);
-            }
+
+            await _bucketS3Service.DeleteSingleObject(entity.Photo);
+
 
             var cell = await _serviceApi.Delete(code, client);
             if (!cell) return View();
