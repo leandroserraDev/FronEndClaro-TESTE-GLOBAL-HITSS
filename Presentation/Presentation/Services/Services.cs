@@ -37,21 +37,27 @@ namespace Presentation.Services
         private async Task<string> ConvertImageToBase64(string path)
         {
 
-            var imageBucketS3 = await _bucketS3Service.DownloadObjectAsync(path);
-            if (imageBucketS3 != null)
+            try
             {
-                using (MemoryStream m = new MemoryStream())
+                var imageBucketS3 = await _bucketS3Service.DownloadObjectAsync(path);
+                if (imageBucketS3 != null)
                 {
-                    await imageBucketS3.CopyToAsync(m);
-                    byte[] imageBytes = m.ToArray();
+                    using (MemoryStream m = new MemoryStream())
+                    {
+                        await imageBucketS3.CopyToAsync(m);
+                        byte[] imageBytes = m.ToArray();
 
-                    // Convert byte[] to Base64 String
-                    string base64String = Convert.ToBase64String(imageBytes);
-                    return base64String;
+                        // Convert byte[] to Base64 String
+                        string base64String = Convert.ToBase64String(imageBytes);
+                        return await Task.FromResult(base64String);
+                    }
+
                 }
-
             }
-
+            catch (Exception e) {
+                return null;
+            }
+      
             return null;
 
         }
@@ -74,7 +80,7 @@ namespace Presentation.Services
             }
 
   
-            return await Task.FromResult(cells);
+            return cells;
         }
 
         public async Task<bool> Create(CellViewModel cell, HttpClient client)
@@ -90,8 +96,7 @@ namespace Presentation.Services
 
 
             HttpResponseMessage response = await client.PostAsync("claro/mobile", contentData);
-            string stringResult = response.Content.
-        ReadAsStringAsync().Result;
+            string stringResult = response.Content.ReadAsStringAsync().Result;
 
             stringResult.Contains("True");
 

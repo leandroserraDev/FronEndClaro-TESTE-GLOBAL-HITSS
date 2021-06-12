@@ -23,15 +23,15 @@ namespace HAdministradora.Infra.CrossCutting.Aws.Services
 
         public BucketS3Service(IConfiguration config)
         {
- 
+
             _config = config;
             AcessSecret = _config.GetSection("AWS_S3_ACESS_SECRET").Value;
             AcessKey = _config.GetSection("AWS_S3_ACESS_KEY").Value;
             BucketName = _config.GetSection("AWS_S3_BUCKET_NAME").Value;
             bucketRegion = RegionEndpoint.USEast2;
+
             _s3Client = new AmazonS3Client(AcessKey, AcessSecret, bucketRegion);
         }
-
         #region Upload Files
         public async Task<string> UploadObjectAsync(Stream fileStream, string filePath)
         {
@@ -67,7 +67,7 @@ namespace HAdministradora.Infra.CrossCutting.Aws.Services
                 return await Task.FromResult(bucketWithFileNameString);
 
             }
-            catch (Exception ex)
+            catch
             {
 
                 return null;
@@ -82,22 +82,20 @@ namespace HAdministradora.Infra.CrossCutting.Aws.Services
             try
             {
 
-                using (_s3Client)
+
+                var transferUtility = new TransferUtility(_s3Client);
+                var resposta = await transferUtility.OpenStreamAsync(BucketName, fileName);
+
+                if (resposta != null)
                 {
-                    var ms = new MemoryStream();
-                    var fileTransferUtility = new TransferUtility(_s3Client);
-
-                    GetObjectResponse response = await _s3Client.GetObjectAsync(BucketName, fileName);
-
-                    if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        
-                        return  response.ResponseStream;
-                    }
-                    else
-                        return null;
+                    return resposta;
+                }
+                else
+                {
+                    return null;
 
                 }
+
             }
             catch (AmazonS3Exception ex)
             {
