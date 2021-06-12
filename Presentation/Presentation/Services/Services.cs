@@ -55,57 +55,41 @@ namespace Presentation.Services
             return null;
 
         }
-        public async Task<List<Cell>> GetAll(HttpClient client)
+        public async Task<List<CellViewModel>> GetAll(HttpClient client)
         {
 
             string baseUrl = localHost;
             client.BaseAddress = new Uri(baseUrl);
-            var contentType = new MediaTypeWithQualityHeaderValue
-        ("application/json");
+            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
-
-            HttpResponseMessage response = await client.GetAsync
-        ("/api/claro/mobile");
+            HttpResponseMessage response = await client.GetAsync("claro/mobile");
             string stringCells = await response.Content.ReadAsStringAsync();
             List<CellViewModel> cells = JsonSerializer.Deserialize<List<CellViewModel>>(stringCells);
 
-            var listCell = new List<Cell>();
-            foreach (var cell in cells)
+            foreach(var item in cells)
             {
-                var newEntity = new Cell()
-                {
-                    Code = cell.code,
-                    Model = cell.model,
-                    Price = cell.price,
-                    Brand = cell.brand,
-                    Photo = await ConvertImageToBase64(cell.photo),
-                    Date = cell.date
-                };
-
-                newEntity.Date.ToString("dd/MM/yyyy");
-
-                listCell.Add(newEntity);
+                item.photo = await ConvertImageToBase64(item.photo);
             }
 
-            return await Task.FromResult(listCell);
+  
+            return await Task.FromResult(cells);
         }
 
         public async Task<bool> Create(CellViewModel cell, HttpClient client)
         {
             string baseUrl = localHost;
             client.BaseAddress = new Uri(baseUrl);
-            var contentType = new MediaTypeWithQualityHeaderValue
-        ("application/json");
+            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
             string stringData = JsonSerializer.Serialize(cell);
-            var contentData = new StringContent(stringData,
-        System.Text.Encoding.UTF8, "application/json");
+            var contentData = new StringContent(stringData,System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PostAsync("/api/claro/mobile", contentData);
+            HttpResponseMessage response = await client.PostAsync("claro/mobile", contentData);
             string stringResult = response.Content.
         ReadAsStringAsync().Result;
 
@@ -121,13 +105,13 @@ namespace Presentation.Services
             client.BaseAddress = new Uri(baseUrl);
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
             string stringData = JsonSerializer.Serialize(cell);
             var contentData = new StringContent(stringData, System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PutAsync($@"/api/claro/mobile/{code}", contentData);
+            HttpResponseMessage response = await client.PutAsync($@"claro/mobile/{code}", contentData);
 
             string stringResult = response.Content.ReadAsStringAsync().Result;
 
@@ -138,17 +122,15 @@ namespace Presentation.Services
         }
 
 
-        public async Task<Cell> GetReal(String code, HttpClient client)
+        public async Task<CellViewModel> GetReal(String code, HttpClient client)
         {
             string baseUrl = localHost;
-
+            client.BaseAddress = new Uri(baseUrl);
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
-
-            UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
-
-            var response = await client.GetAsync(builder.Uri);
+            var response = await client.GetAsync($@"claro/mobile/{code}");
 
             string stringCells = await response.Content.ReadAsStringAsync();
 
@@ -156,58 +138,38 @@ namespace Presentation.Services
 
             if (cell == null) return null;
 
-            var newEntity = new Cell()
-            {
-                Code = cell.code,
-                Model = cell.model,
-                Price = cell.price,
-                Brand = cell.brand,
-                Photo = cell.photo,
-                Date = cell.date
-            };
-
-            return newEntity;
+            return cell;
         }
 
 
 
-        public async Task<Cell> Get(String code, HttpClient client)
+        public async Task<CellViewModel> Get(String code, HttpClient client)
         {
-
+            string baseUrl = localHost;
+            client.BaseAddress = new Uri(baseUrl);
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
 
-            UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
-
-            var response = await client.GetAsync(builder.Uri);
-
+            HttpResponseMessage response = await client.GetAsync($@"claro/mobile/{code}");
             string stringCells = await response.Content.ReadAsStringAsync();
 
             CellViewModel cell = JsonSerializer.Deserialize<CellViewModel>(stringCells);
 
             if (cell == null) return null;
 
-            var newEntity = new Cell()
-            {
-                Code = cell.code,
-                Model = cell.model,
-                Price = cell.price,
-                Brand = cell.brand,
-                Photo = await ConvertImageToBase64(cell.photo),
-                Date = cell.date
-            };
-
-            return newEntity;
+            cell.photo = await ConvertImageToBase64(cell.photo);
+                
+            return cell;
         }
 
         public async Task<bool> Delete(String code, HttpClient client)
         {
 
-            var contentType = new MediaTypeWithQualityHeaderValue
-        ("application/json");
+            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
             UriBuilder builder = new UriBuilder($@"{localHost}claro/mobile/{code}");
 
@@ -225,7 +187,7 @@ namespace Presentation.Services
             client.BaseAddress = new Uri(baseUrl);
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "843b79e3-d411-4c09-a0a7-f141f623bd1d");
 
             string stringData = JsonSerializer.Serialize(user);
             var contentData = new StringContent(stringData, System.Text.Encoding.UTF8, "application/json");
@@ -253,7 +215,7 @@ namespace Presentation.Services
             var contentData = new StringContent(stringData, System.Text.Encoding.UTF8, "application/json");
 
 
-            HttpResponseMessage response = await client.PostAsync("/api/auth/login", contentData);
+            HttpResponseMessage response = await client.PostAsync("auth/login", contentData);
             string stringJWT = await response.Content.ReadAsStringAsync();
             JWT jwt = JsonSerializer.Deserialize<JWT>(stringJWT);
 

@@ -1,65 +1,65 @@
-﻿@model IEnumerable<Presentation.Models.Cell>
+﻿@model IEnumerable<Presentation.Models.CellViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Claro Cells";
 }
+@Html.Partial("_nav")
 
-<h1>Index</h1>
+<div class="form-group">
+    @Html.ActionLink("Add new Cell", "Create", "Cell",null, new { @class = "btn btn-primary" })
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+</div>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Code)
+                @Html.DisplayNameFor(model => model.code)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Model)
+                @Html.DisplayNameFor(model => model.model)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @Html.DisplayNameFor(model => model.price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Brand)
+                @Html.DisplayNameFor(model => model.brand)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Photo)
+                @Html.DisplayNameFor(model => model.photo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                @Html.DisplayNameFor(model => model.date)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-       @foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Code)
+                @Html.DisplayFor(modelItem => item.code)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Model)
+                @Html.DisplayFor(modelItem => item.model)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.price)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Brand)
+                @Html.DisplayFor(modelItem => item.brand)
             </td>
             <td>
 
-                 <img src="data:image/*;base64,@(item.Photo)" style="width:50px; height:50px;">
+                <img src="data:image/*;base64,@(item.photo)" style="width:50px; height:50px;">
 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Date)
+                @Html.DisplayFor(modelItem => item.date)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { code =item.Code }, new { @class = "btn btn-warning" }) 
-                @Html.ActionLink("Details", "Details", new { code = item.Code }, new { @class = "btn btn-primary" }) 
-                @Html.ActionLink("Delete", "Delete", new { code = item.Code }, new { @class = "btn btn-danger" })
+                @Html.ActionLink("Edit", "Edit", new { code =item.code }, new { @class = "btn btn-warning" })
+                @Html.ActionLink("Details", "Details", new { code = item.code }, new { @class = "btn btn-primary" })
+                @Html.ActionLink("Delete", "Delete", new { code = item.code }, new { @class = "btn btn-danger" })
             </td>
         </tr>
 }

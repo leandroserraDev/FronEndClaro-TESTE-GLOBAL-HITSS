@@ -38,7 +38,7 @@ namespace Presentation.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var client = new HttpClient();
+             var client = new HttpClient();
 
 
 
@@ -51,9 +51,8 @@ namespace Presentation.Controllers
                 return RedirectToAction("Index", "Auth");
             }
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
             var cells = await _serviceApi.GetAll(client);
+            
             if (cells == null) return View();
 
             return View(cells);
@@ -72,7 +71,6 @@ namespace Presentation.Controllers
                 TempData["LoginFailure"] = "Login failure";
                 return RedirectToAction("Index", "Auth");
             }
-
 
             var entity = await _serviceApi.Get(code, client);
             if (entity == null) return RedirectToAction("Index", "Cell");
@@ -119,9 +117,17 @@ namespace Presentation.Controllers
                     return View();
                 }
 
-                string pathAWS = Path.Combine(cell.Model, Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType);
+                string pathAWS = (Guid.NewGuid().ToString().Substring(0, 6) + "." + contentType).Replace(" ", "");
 
                 //Save image in s3 amazon
+
+                var stream = cell.ImageFile.OpenReadStream().Length > 7000000;
+                if (stream)
+                {
+                    TempData["LoginFailure"] = "Image length is not applicable, please, insert files with max length 7mb";
+                    return View();
+
+                }
 
                 await _bucketS3Service.UploadObjectAsync(cell.ImageFile.OpenReadStream(), pathAWS);
 
@@ -203,7 +209,15 @@ namespace Presentation.Controllers
                 return View();
             }
 
-            string pathAWS = Path.Combine(model, Guid.NewGuid().ToString().Substring(0, 6).Trim() + "." + contentType);
+            string pathAWS = (Guid.NewGuid().ToString().Substring(0, 6) + "." + contentType).Replace(" ", "");
+
+            var stream = formCollection.Files[0].OpenReadStream().Length > 8000;
+            if (stream)
+            {
+                TempData["LoginFailure"] = "Image length is not applicable, please, insert files with max length 7mb";
+                return View();
+
+            }
 
             await _bucketS3Service.UploadObjectAsync(formCollection.Files[0].OpenReadStream(), pathAWS);
 
@@ -222,7 +236,7 @@ namespace Presentation.Controllers
             if (entity == null) return RedirectToAction("Index", "Cell");
 
 
-            await _bucketS3Service.DeleteSingleObject(entity.Photo);
+            await _bucketS3Service.DeleteSingleObject(entity.photo);
 
 
             client = new HttpClient();
@@ -286,7 +300,7 @@ namespace Presentation.Controllers
             if (entity == null) return View();
 
 
-            await _bucketS3Service.DeleteSingleObject(entity.Photo);
+            await _bucketS3Service.DeleteSingleObject(entity.photo);
 
 
             var cell = await _serviceApi.Delete(code, client);

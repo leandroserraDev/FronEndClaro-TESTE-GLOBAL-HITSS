@@ -24,6 +24,7 @@ namespace Presentation.Controllers
 
         [AllowAnonymous]
         public async Task<IActionResult> Login(User user)
+        
         {
             var userViewModel = new UserViewModel()
             {
@@ -31,6 +32,12 @@ namespace Presentation.Controllers
                 password = user.Password
             };
             var jwt = await _serviceApi.LoginUser(userViewModel);
+
+            if (jwt == null || string.IsNullOrEmpty(jwt.token))
+            {
+                TempData["LoginFailure"] = "Create User";
+                return RedirectToAction("Index", "Auth");
+            }
 
             // HttpContext.Response.Cookies.Append(
             HttpContext.Response.Cookies.Append("bearer", jwt.token, new CookieOptions { Path = "/" });
@@ -51,20 +58,14 @@ namespace Presentation.Controllers
         public async Task<ActionResult> Index()
         {
 
-            string token = Request.Cookies["bearer"];
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                return RedirectToAction("Index", "Cell");
-            }
-
-            return View();
+            return await Task.FromResult(View());
         }
 
         // GET: AuthController/Create
-        public ActionResult Create()
+
+        public async Task<ActionResult> Create()
         {
-            return View();
+            return await Task.FromResult(View());
         }
 
         // POST: AuthController/Create
@@ -72,9 +73,29 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(UserViewModel user)
         {
-            await _serviceApi.CreateUser(user);
+            var usuario = await _serviceApi.CreateUser(user);
+            if (usuario)
+            {
 
+                var jwt = await _serviceApi.LoginUser(user);
+
+                if (jwt == null || string.IsNullOrEmpty(jwt.token))
+                {
+                    TempData["LoginFailure"] = "Create User";
+                    return RedirectToAction("Index", "Auth");
+                }
+
+                // HttpContext.Response.Cookies.Append(
+                HttpContext.Response.Cookies.Append("bearer", jwt.token, new CookieOptions { Path = "/" });
+
+                ViewBag.Message = "User logged in successfully!";
+
+                return RedirectToAction("Index", "Cell");
+            }
+
+            TempData["LoginFailure"] = "Login failure";
             return RedirectToAction("Index", "Auth");
+
         }
 
 
