@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Presentation</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
-       
     </header>
 
     <div class="container">
@@ -18,14 +18,39 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted fixed-bottom" style="height:20px">
+    <footer class="border-top footer" style="background-color:white">
         <div class="container">
             &copy; @DateTime.Now - Presentation - Test Global Hitss - <a href="https://github.com/leandroserraDev" target="_blank">GitHub</a> -  <a href="https://www.linkedin.com/in/leandroserra-dev/" target="_blank">LinkdIn</a>
         </div>
     </footer>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".image").bind('click', function () {
+
+                $(this).animate({ height: "200px", width: "200px" });
+
+            });
+            $(".image").bind('mouseout', function () {
+
+                $(this).animate({ height: "70px", width: "70px" });
+
+            });
+
+        })
+
+
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
 </body>
+
+
 </html>

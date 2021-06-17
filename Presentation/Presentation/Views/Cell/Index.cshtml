@@ -1,67 +1,72 @@
 ﻿@model IEnumerable<Presentation.Models.CellViewModel>
 
-@{
-    ViewData["Title"] = "Claro Cells";
-}
-@Html.Partial("_nav")
 
-<div class="form-group">
-    @Html.ActionLink("Add new Cell", "Create", "Cell",null, new { @class = "btn btn-primary" })
+    @{
+        ViewData["Title"] = "Claro Cells";
+    }
+    @Html.Partial("_nav")
+<div style="padding-top:90px">
+
+    <div class="form-group">
+        @Html.ActionLink("Add new Cell", "Create", "Cell", null, new { @class = "btn btn-primary" })
+
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.code)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.model)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.photo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.date)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.model)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.brand)
+                    </td>
+                    <td>
+
+                        <img class="image" src="data:image/*;base64,@(item.photo)" style="width:70px; height:70px;">
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.date)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { code = item.code }, new { @class = "btn btn-warning" })
+                        @Html.ActionLink("Details", "Details", new { code = item.code }, new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Delete", "Delete", new { code = item.code }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.brand)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.photo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.date)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.model)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.brand)
-            </td>
-            <td>
-
-                <img src="data:image/*;base64,@(item.photo)" style="width:50px; height:50px;">
-
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.date)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { code =item.code }, new { @class = "btn btn-warning" })
-                @Html.ActionLink("Details", "Details", new { code = item.code }, new { @class = "btn btn-primary" })
-                @Html.ActionLink("Delete", "Delete", new { code = item.code }, new { @class = "btn btn-danger" })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
