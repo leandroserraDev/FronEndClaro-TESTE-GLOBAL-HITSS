@@ -211,11 +211,11 @@ namespace Presentation.Controllers
 
             string pathAWS = (Guid.NewGuid().ToString().Substring(0, 6) + "." + contentType).Replace(" ", "");
 
-            var stream = formCollection.Files[0].OpenReadStream().Length > 8000;
+            var stream = formCollection.Files[0].OpenReadStream().Length > 800000;
             if (stream)
             {
-                TempData["LoginFailure"] = "Image length is not applicable, please, insert files with max length 7mb";
-                return View();
+                TempData["ImageLength"] = "Image length is not applicable, please, insert files with max length 7mb";
+                return RedirectToAction("Edit", "Cell", new {code = code });
 
             }
 
